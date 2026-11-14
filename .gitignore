@@ -1,0 +1,47 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache and build artefacts
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Raw and intermediate data (the original dataset must not be committed)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Trained model binaries and temporary artefacts
+models/*
+!models/.gitkeep
+
+# Temporary / log files
+*.log
+*.tmp
+tmp/
+notebooks/_execute.log
+notebooks/_build_notebook.py
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor settings
+.idea/
+.vscode/
+
+# Excel lock files
+~$*

@@ -1,0 +1,498 @@
+{
+  "objective": "Select a model that catches a substantial share of defaulters without an implausibly high false-alarm rate, while preferring the strongest threshold-independent ranking quality.",
+  "reference_threshold": 0.5,
+  "recall_floor": 0.55,
+  "precision_floor": 0.5,
+  "primary_metric": "validation_pr_auc",
+  "tie_breakers": [
+    "validation_f1",
+    "validation_roc_auc"
+  ],
+  "rule": "At the 0.50 reference threshold, require validation recall >= 0.55 and validation precision >= 0.50; among eligible models select the highest validation_pr_auc, breaking ties with validation_f1 and then validation_roc_auc.",
+  "fallback": "If no candidate model satisfies both floors, select the highest validation PR-AUC among non-baseline candidates and report that the policy was not satisfied.  A baseline is never eligible and can never become the selected production model through fallback ranking.",
+  "eligibility_caveat": "Eligibility is evaluated at the 0.50 reference threshold only.  The precision and recall floors do not guarantee the same metrics at the final selected threshold.",
+  "rationale": "The recall floor encodes a stated preference for catching a substantial share of defaulters.  Without a verified cost matrix this is not a claim that a missed defaulter always costs more than a false alarm.  A precision floor acknowledges that a review team cannot investigate an arbitrarily large number of false alarms.  PR-AUC is the primary ranking metric because the positive class is the minority.",
+  "cost_caveat": "These floors are stated modelling assumptions.  No verified financial cost of a false negative versus a false positive was available, so the selection is a modelling objective rather than a validated cost optimisation.",
+  "selection_data": "validation split",
+  "threshold_calibration_data": "out-of-fold predictions on the training split only",
+  "model_selection_note": "The model is chosen using validation performance while its threshold is calibrated from training-only out-of-fold predictions.  The two decisions use different data, so the validation-optimal model need not be threshold-optimal, and the calibrated threshold assumes predictions transfer to the train+validation refit.",
+  "baseline_excluded_from_ranking": true,
+  "eligible_models": [
+    "Random Forest (class weights)"
+  ],
+  "policy_satisfied": true,
+  "selected_model": "Random Forest (class weights)",
+  "selected_validation_metrics": {
+    "precision": 0.5527888446215139,
+    "recall": 0.5577889447236181,
+    "f1": 0.5552776388194097,
+    "roc_auc": 0.7845388138983075,
+    "pr_auc": 0.5623104963987493
+  },
+  "ranked_models": [
+    {
+      "selection_rank": 1,
+      "model": "Random Forest (class weights)",
+      "role": "imbalance",
+      "eligible": true,
+      "validation_precision": 0.5527888446215139,
+      "validation_recall": 0.5577889447236181,
+      "validation_f1": 0.5552776388194097,
+      "validation_roc_auc": 0.7845388138983075,
+      "validation_pr_auc": 0.5623104963987493
+    },
+    {
+      "selection_rank": 2,
+      "model": "Gradient Boosting (tuned)",
+      "role": "tuned",
+      "eligible": false,
+      "validation_precision": 0.7270875763747454,
+      "validation_recall": 0.3587939698492462,
+      "validation_f1": 0.48048452220726784,
+      "validation_roc_auc": 0.7917559265657819,
+      "validation_pr_auc": 0.5713288036268631
+    },
+    {
+      "selection_rank": 3,
+      "model": "Gradient Boosting",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.7243460764587525,
+      "validation_recall": 0.36180904522613067,
+      "validation_f1": 0.48257372654155495,
+      "validation_roc_auc": 0.7919738492749051,
+      "validation_pr_auc": 0.570920892261906
+    },
+    {
+      "selection_rank": 4,
+      "model": "Random Forest",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.7239263803680982,
+      "validation_recall": 0.35577889447236183,
+      "validation_f1": 0.477088948787062,
+      "validation_roc_auc": 0.7855598964867131,
+      "validation_pr_auc": 0.5703386266074374
+    },
+    {
+      "selection_rank": 5,
+      "model": "Random Forest (tuned)",
+      "role": "tuned",
+      "eligible": false,
+      "validation_precision": 0.7131474103585658,
+      "validation_recall": 0.3597989949748744,
+      "validation_f1": 0.47828991315965264,
+      "validation_roc_auc": 0.7834460462082167,
+      "validation_pr_auc": 0.5665052959435714
+    },
+    {
+      "selection_rank": 6,
+      "model": "Logistic Regression + SMOTE",
+      "role": "imbalance",
+      "eligible": false,
+      "validation_precision": 0.45901639344262296,
+      "validation_recall": 0.6190954773869347,
+      "validation_f1": 0.5271715875053488,
+      "validation_roc_auc": 0.7707916185779109,
+      "validation_pr_auc": 0.5498452113826748
+    },
+    {
+      "selection_rank": 7,
+      "model": "Support Vector Machine",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.7156626506024096,
+      "validation_recall": 0.2984924623115578,
+      "validation_f1": 0.42127659574468085,
+      "validation_roc_auc": 0.7694772005534091,
+      "validation_pr_auc": 0.5490651383786297
+    },
+    {
+      "selection_rank": 8,
+      "model": "Logistic Regression",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.7081339712918661,
+      "validation_recall": 0.2974874371859296,
+      "validation_f1": 0.418966737438075,
+      "validation_roc_auc": 0.7711081799869532,
+      "validation_pr_auc": 0.5486795870938572
+    },
+    {
+      "selection_rank": 9,
+      "model": "Logistic Regression (class weights)",
+      "role": "imbalance",
+      "eligible": false,
+      "validation_precision": 0.46130952380952384,
+      "validation_recall": 0.6231155778894473,
+      "validation_f1": 0.5301410859341599,
+      "validation_roc_auc": 0.7713048839059777,
+      "validation_pr_auc": 0.5478816735206278
+    },
+    {
+      "selection_rank": 10,
+      "model": "Decision Tree",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.7181628392484343,
+      "validation_recall": 0.3457286432160804,
+      "validation_f1": 0.46675712347354137,
+      "validation_roc_auc": 0.7707109011534132,
+      "validation_pr_auc": 0.5330746394765236
+    },
+    {
+      "selection_rank": 11,
+      "model": "K-Nearest Neighbors",
+      "role": "base",
+      "eligible": false,
+      "validation_precision": 0.6594059405940594,
+      "validation_recall": 0.33467336683417087,
+      "validation_f1": 0.444,
+      "validation_roc_auc": 0.7608645223263248,
+      "validation_pr_auc": 0.5234502455893983
+    },
+    {
+      "selection_rank": 12,
+      "model": "Dummy (majority class)",
+      "role": "baseline",
+      "eligible": false,
+      "validation_precision": 0.0,
+      "validation_recall": 0.0,
+      "validation_f1": 0.0,
+      "validation_roc_auc": 0.5,
+      "validation_pr_auc": 0.22111111111111112
+    }
+  ],
+  "cost_sensitivity": [
+    {
+      "model": "Random Forest (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 197.556,
+      "validation_fn": 440,
+      "validation_fp": 449,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 588.667,
+      "validation_fn": 440,
+      "validation_fp": 449,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1077.556,
+      "validation_fn": 440,
+      "validation_fp": 449,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 171.556,
+      "validation_fn": 638,
+      "validation_fp": 134,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 738.667,
+      "validation_fn": 638,
+      "validation_fp": 134,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1447.556,
+      "validation_fn": 638,
+      "validation_fp": 134,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 171.556,
+      "validation_fn": 635,
+      "validation_fp": 137,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 736.0,
+      "validation_fn": 635,
+      "validation_fp": 137,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Gradient Boosting",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1441.556,
+      "validation_fn": 635,
+      "validation_fp": 137,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 172.444,
+      "validation_fn": 641,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 742.222,
+      "validation_fn": 641,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1454.444,
+      "validation_fn": 641,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 173.556,
+      "validation_fn": 637,
+      "validation_fp": 144,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 739.778,
+      "validation_fn": 637,
+      "validation_fp": 144,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Random Forest (tuned)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1447.556,
+      "validation_fn": 637,
+      "validation_fp": 144,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression + SMOTE",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 245.556,
+      "validation_fn": 379,
+      "validation_fp": 726,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression + SMOTE",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 582.444,
+      "validation_fn": 379,
+      "validation_fp": 726,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression + SMOTE",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1003.556,
+      "validation_fn": 379,
+      "validation_fp": 726,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Support Vector Machine",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 181.333,
+      "validation_fn": 698,
+      "validation_fp": 118,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Support Vector Machine",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 801.778,
+      "validation_fn": 698,
+      "validation_fp": 118,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Support Vector Machine",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1577.333,
+      "validation_fn": 698,
+      "validation_fp": 118,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 182.444,
+      "validation_fn": 699,
+      "validation_fp": 122,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 803.778,
+      "validation_fn": 699,
+      "validation_fp": 122,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1580.444,
+      "validation_fn": 699,
+      "validation_fp": 122,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 244.222,
+      "validation_fn": 375,
+      "validation_fp": 724,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 577.556,
+      "validation_fn": 375,
+      "validation_fp": 724,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Logistic Regression (class weights)",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 994.222,
+      "validation_fn": 375,
+      "validation_fp": 724,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Decision Tree",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 174.667,
+      "validation_fn": 651,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Decision Tree",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 753.333,
+      "validation_fn": 651,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "Decision Tree",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1476.667,
+      "validation_fn": 651,
+      "validation_fp": 135,
+      "validation_samples": 4500
+    },
+    {
+      "model": "K-Nearest Neighbors",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 1,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 185.333,
+      "validation_fn": 662,
+      "validation_fp": 172,
+      "validation_samples": 4500
+    },
+    {
+      "model": "K-Nearest Neighbors",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 5,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 773.778,
+      "validation_fn": 662,
+      "validation_fp": 172,
+      "validation_samples": 4500
+    },
+    {
+      "model": "K-Nearest Neighbors",
+      "reference_threshold": 0.5,
+      "fn_fp_cost_ratio": 10,
+      "hypothetical_fn_fp_ratio": true,
+      "expected_cost_per_1000_scored": 1509.333,
+      "validation_fn": 662,
+      "validation_fp": 172,
+      "validation_samples": 4500
+    }
+  ]
+}

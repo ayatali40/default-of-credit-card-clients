@@ -1,0 +1,198 @@
+{
+  "raw": {
+    "n_rows": 30000,
+    "n_columns": 25,
+    "columns": [
+      "ID",
+      "LIMIT_BAL",
+      "SEX",
+      "EDUCATION",
+      "MARRIAGE",
+      "AGE",
+      "PAY_1",
+      "PAY_2",
+      "PAY_3",
+      "PAY_4",
+      "PAY_5",
+      "PAY_6",
+      "BILL_AMT1",
+      "BILL_AMT2",
+      "BILL_AMT3",
+      "BILL_AMT4",
+      "BILL_AMT5",
+      "BILL_AMT6",
+      "PAY_AMT1",
+      "PAY_AMT2",
+      "PAY_AMT3",
+      "PAY_AMT4",
+      "PAY_AMT5",
+      "PAY_AMT6",
+      "default"
+    ],
+    "dtypes": {
+      "ID": "int64",
+      "LIMIT_BAL": "int64",
+      "SEX": "int64",
+      "EDUCATION": "int64",
+      "MARRIAGE": "int64",
+      "AGE": "int64",
+      "PAY_1": "int64",
+      "PAY_2": "int64",
+      "PAY_3": "int64",
+      "PAY_4": "int64",
+      "PAY_5": "int64",
+      "PAY_6": "int64",
+      "BILL_AMT1": "int64",
+      "BILL_AMT2": "int64",
+      "BILL_AMT3": "int64",
+      "BILL_AMT4": "int64",
+      "BILL_AMT5": "int64",
+      "BILL_AMT6": "int64",
+      "PAY_AMT1": "int64",
+      "PAY_AMT2": "int64",
+      "PAY_AMT3": "int64",
+      "PAY_AMT4": "int64",
+      "PAY_AMT5": "int64",
+      "PAY_AMT6": "int64",
+      "default": "int64"
+    },
+    "missing_total": 0,
+    "missing_by_column": {},
+    "duplicate_rows": 0,
+    "duplicate_ids": 0,
+    "unexpected_category_codes": {
+      "EDUCATION": {
+        "0": 14,
+        "5": 280,
+        "6": 51
+      },
+      "MARRIAGE": {
+        "0": 54
+      }
+    },
+    "unique_values": {
+      "SEX": 2,
+      "EDUCATION": 7,
+      "MARRIAGE": 4
+    },
+    "target_distribution": {
+      "0": 23364,
+      "1": 6636
+    },
+    "default_rate": 0.2212,
+    "imbalance_ratio": 3.5208
+  },
+  "cleaned": {
+    "n_rows": 30000,
+    "n_columns": 25,
+    "columns": [
+      "ID",
+      "LIMIT_BAL",
+      "SEX",
+      "EDUCATION",
+      "MARRIAGE",
+      "AGE",
+      "PAY_1",
+      "PAY_2",
+      "PAY_3",
+      "PAY_4",
+      "PAY_5",
+      "PAY_6",
+      "BILL_AMT1",
+      "BILL_AMT2",
+      "BILL_AMT3",
+      "BILL_AMT4",
+      "BILL_AMT5",
+      "BILL_AMT6",
+      "PAY_AMT1",
+      "PAY_AMT2",
+      "PAY_AMT3",
+      "PAY_AMT4",
+      "PAY_AMT5",
+      "PAY_AMT6",
+      "default"
+    ],
+    "dtypes": {
+      "ID": "int64",
+      "LIMIT_BAL": "int64",
+      "SEX": "int64",
+      "EDUCATION": "int64",
+      "MARRIAGE": "int64",
+      "AGE": "int64",
+      "PAY_1": "int64",
+      "PAY_2": "int64",
+      "PAY_3": "int64",
+      "PAY_4": "int64",
+      "PAY_5": "int64",
+      "PAY_6": "int64",
+      "BILL_AMT1": "int64",
+      "BILL_AMT2": "int64",
+      "BILL_AMT3": "int64",
+      "BILL_AMT4": "int64",
+      "BILL_AMT5": "int64",
+      "BILL_AMT6": "int64",
+      "PAY_AMT1": "int64",
+      "PAY_AMT2": "int64",
+      "PAY_AMT3": "int64",
+      "PAY_AMT4": "int64",
+      "PAY_AMT5": "int64",
+      "PAY_AMT6": "int64",
+      "default": "int32"
+    },
+    "missing_total": 0,
+    "missing_by_column": {},
+    "duplicate_rows": 0,
+    "duplicate_ids": 0,
+    "unexpected_category_codes": {
+      "EDUCATION": {},
+      "MARRIAGE": {}
+    },
+    "unique_values": {
+      "SEX": 2,
+      "EDUCATION": 4,
+      "MARRIAGE": 3
+    },
+    "target_distribution": {
+      "0": 23364,
+      "1": 6636
+    },
+    "default_rate": 0.2212,
+    "imbalance_ratio": 3.5208
+  },
+  "unexpected_codes_before_cleaning": {
+    "EDUCATION": {
+      "0": 14,
+      "5": 280,
+      "6": 51
+    },
+    "MARRIAGE": {
+      "0": 54
+    }
+  },
+  "rows_removed_as_duplicates": 0,
+  "cleaning_policy": {
+    "duplicate_rows": "removed",
+    "extreme_financial_values": "retained (legitimate high-value customers)",
+    "education_codes_0_5_6": "mapped to 4 (others/unknown)",
+    "marriage_code_0": "mapped to 3 (others/unknown)",
+    "missing_values": "imputed inside training pipeline only"
+  },
+  "feature_engineering": {
+    "engineered_features": [
+      "BILL_AVG",
+      "BILL_TOTAL",
+      "PAY_AVG",
+      "PAY_TOTAL",
+      "NUM_DELAYED_MONTHS",
+      "NUM_SEVERE_DELAY_MONTHS",
+      "MAX_DELAY_STATUS",
+      "AVG_DELAY_STATUS",
+      "UTILIZATION_AVG",
+      "UTILIZATION_LAST",
+      "PAYMENT_TO_BILL_RATIO",
+      "ZERO_PAYMENT_MONTHS"
+    ],
+    "leakage_control": "row-wise transformations only; target not used",
+    "missing_month_policy": "six-month aggregates require all six months; partial histories stay missing and are imputed in the pipeline"
+  }
+}

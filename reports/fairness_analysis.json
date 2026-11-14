@@ -1,0 +1,83 @@
+{
+  "purpose": "exploratory subgroup performance assessment",
+  "model": "Random Forest (class weights)",
+  "threshold": 0.5,
+  "test_samples": 4500,
+  "group_attributes": [
+    "SEX",
+    "AGE_GROUP",
+    "EDUCATION",
+    "MARRIAGE"
+  ],
+  "min_group_size": 200,
+  "min_positives": 30,
+  "n_groups": 14,
+  "n_small_groups": 3,
+  "small_groups": [
+    {
+      "group_attribute": "AGE_GROUP",
+      "group": "60+",
+      "n_records": 62,
+      "n_defaults": 22
+    },
+    {
+      "group_attribute": "EDUCATION",
+      "group": "others/unknown",
+      "n_records": 61,
+      "n_defaults": 4
+    },
+    {
+      "group_attribute": "MARRIAGE",
+      "group": "others/unknown",
+      "n_records": 51,
+      "n_defaults": 10
+    }
+  ],
+  "n_groups_with_undefined_precision": 0,
+  "n_groups_with_undefined_recall": 0,
+  "undefined_metric_groups": [],
+  "missing_group_records": [],
+  "spread_reliable_groups": {
+    "SEX": {
+      "precision": 0.008424077434966759,
+      "recall": 0.028730191397406846,
+      "f1": 0.00936640747420392,
+      "fpr": 0.03663539221746044,
+      "fnr": 0.0287301913974069,
+      "reliable_groups": 2
+    },
+    "AGE_GROUP": {
+      "precision": 0.11737488561522902,
+      "recall": 0.10738107524415647,
+      "f1": 0.10085456433192236,
+      "fpr": 0.031917384358301035,
+      "fnr": 0.10738107524415647,
+      "reliable_groups": 4
+    },
+    "EDUCATION": {
+      "precision": 0.02925609186109679,
+      "recall": 0.08976805297873325,
+      "f1": 0.058804173199388354,
+      "fpr": 0.05594324116264071,
+      "fnr": 0.08976805297873325,
+      "reliable_groups": 3
+    },
+    "MARRIAGE": {
+      "precision": 0.05811108392463904,
+      "recall": 0.002045057228617586,
+      "f1": 0.02915609137055819,
+      "fpr": 0.005472143783904759,
+      "fnr": 0.0020450572286176416,
+      "reliable_groups": 2
+    }
+  },
+  "caveats": [
+    "This is an exploratory subgroup performance assessment, not a complete fairness audit.",
+    "Differences between groups are descriptive and do not establish discrimination or its cause.",
+    "Groups below the minimum size or positive count are flagged; their metrics are statistically unreliable.",
+    "The analysis uses the already-frozen model and decision threshold; no group-specific predictions or thresholds were introduced.",
+    "The test set was used only for final evaluation; subgroup results did not influence model or threshold selection.",
+    "The dataset contains only the demographic variables supplied by the original study; it is not a legal or regulatory assessment."
+  ],
+  "not_a_fairness_audit": true
+}

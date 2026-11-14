@@ -1,0 +1,489 @@
+{
+  "project": "Credit Card Default Prediction",
+  "generated_at": "2026-11-13T20:58:12+00:00",
+  "dataset": {
+    "file": "data\\raw\\default of credit card clients.xls",
+    "raw_rows": 30000,
+    "raw_columns": 25,
+    "cleaned_rows": 30000,
+    "modelled_columns": 37,
+    "target": "default",
+    "default_rate": 0.2212,
+    "duplicate_rows_removed": 0,
+    "unexpected_codes_before_cleaning": {
+      "EDUCATION": {
+        "0": 14,
+        "5": 280,
+        "6": 51
+      },
+      "MARRIAGE": {
+        "0": 54
+      }
+    }
+  },
+  "split": {
+    "strategy": "stratified 70/15/15",
+    "random_state": 42,
+    "train_size": 21000,
+    "validation_size": 4500,
+    "test_size": 4500,
+    "train_default_rate": 0.22123809523809523,
+    "validation_default_rate": 0.22111111111111112,
+    "test_default_rate": 0.22111111111111112
+  },
+  "features": {
+    "numeric": [
+      "LIMIT_BAL",
+      "AGE",
+      "PAY_1",
+      "PAY_2",
+      "PAY_3",
+      "PAY_4",
+      "PAY_5",
+      "PAY_6",
+      "BILL_AMT1",
+      "BILL_AMT2",
+      "BILL_AMT3",
+      "BILL_AMT4",
+      "BILL_AMT5",
+      "BILL_AMT6",
+      "PAY_AMT1",
+      "PAY_AMT2",
+      "PAY_AMT3",
+      "PAY_AMT4",
+      "PAY_AMT5",
+      "PAY_AMT6",
+      "BILL_AVG",
+      "BILL_TOTAL",
+      "PAY_AVG",
+      "PAY_TOTAL",
+      "NUM_DELAYED_MONTHS",
+      "NUM_SEVERE_DELAY_MONTHS",
+      "MAX_DELAY_STATUS",
+      "AVG_DELAY_STATUS",
+      "UTILIZATION_AVG",
+      "UTILIZATION_LAST",
+      "PAYMENT_TO_BILL_RATIO",
+      "ZERO_PAYMENT_MONTHS"
+    ],
+    "categorical": [
+      "SEX",
+      "EDUCATION",
+      "MARRIAGE"
+    ],
+    "engineered": [
+      "BILL_AVG",
+      "BILL_TOTAL",
+      "PAY_AVG",
+      "PAY_TOTAL",
+      "NUM_DELAYED_MONTHS",
+      "NUM_SEVERE_DELAY_MONTHS",
+      "MAX_DELAY_STATUS",
+      "AVG_DELAY_STATUS",
+      "UTILIZATION_AVG",
+      "UTILIZATION_LAST",
+      "PAYMENT_TO_BILL_RATIO",
+      "ZERO_PAYMENT_MONTHS"
+    ],
+    "n_features_used": 35
+  },
+  "preprocessing": {
+    "numeric": "median imputation + StandardScaler, fitted on training data",
+    "categorical": "most-frequent imputation + OneHotEncoder(handle_unknown='ignore')",
+    "pipeline": "ColumnTransformer inside sklearn Pipeline"
+  },
+  "models": {
+    "base_models": [
+      "Logistic Regression",
+      "Decision Tree",
+      "Random Forest",
+      "K-Nearest Neighbors",
+      "Support Vector Machine",
+      "Gradient Boosting"
+    ],
+    "cross_validation": {
+      "folds": 5,
+      "scoring": [
+        "average_precision (PR-AUC)",
+        "ROC-AUC"
+      ],
+      "data": "training split only"
+    },
+    "tuning": {
+      "method": "RandomizedSearchCV",
+      "scoring": "average_precision",
+      "cv_folds": 3,
+      "candidate_selection": "top 2 base models by training CV PR-AUC",
+      "records": [
+        {
+          "model": "Random Forest (tuned)",
+          "candidates_tested": 6,
+          "cv_folds": 3,
+          "scoring": "average_precision",
+          "selection_basis": "training CV PR-AUC",
+          "best_cv_pr_auc": 0.5545677217223274,
+          "best_params": "{\"model__n_estimators\": 200, \"model__min_samples_leaf\": 10, \"model__max_features\": \"sqrt\", \"model__max_depth\": null}",
+          "search_time_seconds": 43.741
+        },
+        {
+          "model": "Gradient Boosting (tuned)",
+          "candidates_tested": 6,
+          "cv_folds": 3,
+          "scoring": "average_precision",
+          "selection_basis": "training CV PR-AUC",
+          "best_cv_pr_auc": 0.5531549322337813,
+          "best_params": "{\"model__subsample\": 0.8, \"model__n_estimators\": 150, \"model__max_depth\": 2, \"model__learning_rate\": 0.1}",
+          "search_time_seconds": 172.023
+        }
+      ]
+    }
+  },
+  "imbalance_experiments": [
+    {
+      "model": "Logistic Regression (class weights)",
+      "handling": "class_weight=balanced",
+      "validation_pr_auc": 0.5478816735206278
+    },
+    {
+      "model": "Random Forest (class weights)",
+      "handling": "class_weight=balanced_subsample",
+      "validation_pr_auc": 0.5623104963987493
+    },
+    {
+      "model": "Logistic Regression + SMOTE",
+      "handling": "SMOTE on training folds only",
+      "validation_pr_auc": 0.5498452113826748
+    }
+  ],
+  "selection": {
+    "policy": {
+      "objective": "Select a model that catches a substantial share of defaulters without an implausibly high false-alarm rate, while preferring the strongest threshold-independent ranking quality.",
+      "reference_threshold": 0.5,
+      "recall_floor": 0.55,
+      "precision_floor": 0.5,
+      "primary_metric": "validation_pr_auc",
+      "tie_breakers": [
+        "validation_f1",
+        "validation_roc_auc"
+      ],
+      "rule": "At the 0.50 reference threshold, require validation recall >= 0.55 and validation precision >= 0.50; among eligible models select the highest validation_pr_auc, breaking ties with validation_f1 and then validation_roc_auc.",
+      "fallback": "If no candidate model satisfies both floors, select the highest validation PR-AUC among non-baseline candidates and report that the policy was not satisfied.  A baseline is never eligible and can never become the selected production model through fallback ranking.",
+      "eligibility_caveat": "Eligibility is evaluated at the 0.50 reference threshold only.  The precision and recall floors do not guarantee the same metrics at the final selected threshold.",
+      "rationale": "The recall floor encodes a stated preference for catching a substantial share of defaulters.  Without a verified cost matrix this is not a claim that a missed defaulter always costs more than a false alarm.  A precision floor acknowledges that a review team cannot investigate an arbitrarily large number of false alarms.  PR-AUC is the primary ranking metric because the positive class is the minority.",
+      "cost_caveat": "These floors are stated modelling assumptions.  No verified financial cost of a false negative versus a false positive was available, so the selection is a modelling objective rather than a validated cost optimisation.",
+      "selection_data": "validation split",
+      "threshold_calibration_data": "out-of-fold predictions on the training split only",
+      "model_selection_note": "The model is chosen using validation performance while its threshold is calibrated from training-only out-of-fold predictions.  The two decisions use different data, so the validation-optimal model need not be threshold-optimal, and the calibrated threshold assumes predictions transfer to the train+validation refit.",
+      "baseline_excluded_from_ranking": true,
+      "eligible_models": [
+        "Random Forest (class weights)"
+      ],
+      "policy_satisfied": true,
+      "selected_model": "Random Forest (class weights)",
+      "selected_validation_metrics": {
+        "precision": 0.5527888446215139,
+        "recall": 0.5577889447236181,
+        "f1": 0.5552776388194097,
+        "roc_auc": 0.7845388138983075,
+        "pr_auc": 0.5623104963987493
+      },
+      "ranked_models": [
+        {
+          "selection_rank": 1,
+          "model": "Random Forest (class weights)",
+          "role": "imbalance",
+          "eligible": true,
+          "validation_precision": 0.5527888446215139,
+          "validation_recall": 0.5577889447236181,
+          "validation_f1": 0.5552776388194097,
+          "validation_roc_auc": 0.7845388138983075,
+          "validation_pr_auc": 0.5623104963987493
+        },
+        {
+          "selection_rank": 2,
+          "model": "Gradient Boosting (tuned)",
+          "role": "tuned",
+          "eligible": false,
+          "validation_precision": 0.7270875763747454,
+          "validation_recall": 0.3587939698492462,
+          "validation_f1": 0.48048452220726784,
+          "validation_roc_auc": 0.7917559265657819,
+          "validation_pr_auc": 0.5713288036268631
+        },
+        {
+          "selection_rank": 3,
+          "model": "Gradient Boosting",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.7243460764587525,
+          "validation_recall": 0.36180904522613067,
+          "validation_f1": 0.48257372654155495,
+          "validation_roc_auc": 0.7919738492749051,
+          "validation_pr_auc": 0.570920892261906
+        },
+        {
+          "selection_rank": 4,
+          "model": "Random Forest",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.7239263803680982,
+          "validation_recall": 0.35577889447236183,
+          "validation_f1": 0.477088948787062,
+          "validation_roc_auc": 0.7855598964867131,
+          "validation_pr_auc": 0.5703386266074374
+        },
+        {
+          "selection_rank": 5,
+          "model": "Random Forest (tuned)",
+          "role": "tuned",
+          "eligible": false,
+          "validation_precision": 0.7131474103585658,
+          "validation_recall": 0.3597989949748744,
+          "validation_f1": 0.47828991315965264,
+          "validation_roc_auc": 0.7834460462082167,
+          "validation_pr_auc": 0.5665052959435714
+        },
+        {
+          "selection_rank": 6,
+          "model": "Logistic Regression + SMOTE",
+          "role": "imbalance",
+          "eligible": false,
+          "validation_precision": 0.45901639344262296,
+          "validation_recall": 0.6190954773869347,
+          "validation_f1": 0.5271715875053488,
+          "validation_roc_auc": 0.7707916185779109,
+          "validation_pr_auc": 0.5498452113826748
+        },
+        {
+          "selection_rank": 7,
+          "model": "Support Vector Machine",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.7156626506024096,
+          "validation_recall": 0.2984924623115578,
+          "validation_f1": 0.42127659574468085,
+          "validation_roc_auc": 0.7694772005534091,
+          "validation_pr_auc": 0.5490651383786297
+        },
+        {
+          "selection_rank": 8,
+          "model": "Logistic Regression",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.7081339712918661,
+          "validation_recall": 0.2974874371859296,
+          "validation_f1": 0.418966737438075,
+          "validation_roc_auc": 0.7711081799869532,
+          "validation_pr_auc": 0.5486795870938572
+        },
+        {
+          "selection_rank": 9,
+          "model": "Logistic Regression (class weights)",
+          "role": "imbalance",
+          "eligible": false,
+          "validation_precision": 0.46130952380952384,
+          "validation_recall": 0.6231155778894473,
+          "validation_f1": 0.5301410859341599,
+          "validation_roc_auc": 0.7713048839059777,
+          "validation_pr_auc": 0.5478816735206278
+        },
+        {
+          "selection_rank": 10,
+          "model": "Decision Tree",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.7181628392484343,
+          "validation_recall": 0.3457286432160804,
+          "validation_f1": 0.46675712347354137,
+          "validation_roc_auc": 0.7707109011534132,
+          "validation_pr_auc": 0.5330746394765236
+        },
+        {
+          "selection_rank": 11,
+          "model": "K-Nearest Neighbors",
+          "role": "base",
+          "eligible": false,
+          "validation_precision": 0.6594059405940594,
+          "validation_recall": 0.33467336683417087,
+          "validation_f1": 0.444,
+          "validation_roc_auc": 0.7608645223263248,
+          "validation_pr_auc": 0.5234502455893983
+        },
+        {
+          "selection_rank": 12,
+          "model": "Dummy (majority class)",
+          "role": "baseline",
+          "eligible": false,
+          "validation_precision": 0.0,
+          "validation_recall": 0.0,
+          "validation_f1": 0.0,
+          "validation_roc_auc": 0.5,
+          "validation_pr_auc": 0.22111111111111112
+        }
+      ]
+    },
+    "selected_model": "Random Forest (class weights)",
+    "validation_metrics": {
+      "accuracy": 0.8024444444444444,
+      "precision": 0.5527888446215139,
+      "recall": 0.5577889447236181,
+      "f1": 0.5552776388194097,
+      "roc_auc": 0.7845388138983075,
+      "pr_auc": 0.5623104963987493,
+      "tn": 3056,
+      "fp": 449,
+      "fn": 440,
+      "tp": 555,
+      "predicted_positive_rate": 0.22311111111111112,
+      "threshold": 0.5
+    },
+    "threshold": 0.5,
+    "threshold_selection": {
+      "method": "out-of-fold predictions",
+      "data": "training split only",
+      "n_samples": 21000,
+      "folds": 5,
+      "cv": "StratifiedKFold(shuffle=True)",
+      "metric": "f1",
+      "selected_threshold": 0.5,
+      "model_selection_data": "validation split",
+      "diagnostic_validation_f1_threshold": 0.5,
+      "diagnostic_note": "The validation-only F1 threshold is reported for transparency and is not used to make any model or threshold decision.",
+      "oof_metrics_at_selected_threshold": {
+        "threshold": 0.5,
+        "n_samples": 21000,
+        "n_positive": 4646,
+        "accuracy": 0.7908095238095239,
+        "precision": 0.5258955987717503,
+        "recall": 0.5529487731381834,
+        "f1": 0.5390829923407827,
+        "roc_auc": 0.783361492244529,
+        "pr_auc": 0.5534204844403491,
+        "tn": 14038,
+        "fp": 2316,
+        "fn": 2077,
+        "tp": 2569,
+        "predicted_positive_rate": 0.23261904761904761
+      },
+      "model_threshold_dependence": "The model is selected on validation, while the threshold is calibrated from training-only out-of-fold predictions.  The two decisions therefore use different data.  The calibrated threshold assumes the selected model's probability ranking transfers to the train+validation refit.",
+      "note": "Each out-of-fold probability comes from a model fitted without the corresponding training record.  The test set was not accessed.  The threshold is fixed before test evaluation; the final pipeline is then refit on train+validation."
+    },
+    "fit_on": "train + validation",
+    "final_fit_time_seconds": 3.573
+  },
+  "feature_importance": {
+    "primary_method": "permutation importance on the validation split, scoring by average precision, using the model fitted on the training split",
+    "n_repeats": 10,
+    "model_based_method": "impurity-based importances or absolute coefficients from the final refitted pipeline; reported for comparison only",
+    "caveat": "Correlated and derived features can share or duplicate importance. Importance describes predictive association, not causation."
+  },
+  "fairness_analysis": {
+    "report": "reports\\fairness_analysis.json",
+    "table": "reports\\subgroup_performance.csv",
+    "n_groups": 14,
+    "n_small_groups": 3,
+    "caveat": "Exploratory subgroup performance assessment, not a fairness audit."
+  },
+  "final_test": {
+    "selected_model": "Random Forest (class weights)",
+    "threshold": 0.5,
+    "threshold_selection": {
+      "method": "out-of-fold predictions",
+      "data": "training split only",
+      "n_samples": 21000,
+      "folds": 5,
+      "cv": "StratifiedKFold(shuffle=True)",
+      "metric": "f1",
+      "selected_threshold": 0.5,
+      "model_selection_data": "validation split",
+      "diagnostic_validation_f1_threshold": 0.5,
+      "diagnostic_note": "The validation-only F1 threshold is reported for transparency and is not used to make any model or threshold decision.",
+      "oof_metrics_at_selected_threshold": {
+        "threshold": 0.5,
+        "n_samples": 21000,
+        "n_positive": 4646,
+        "accuracy": 0.7908095238095239,
+        "precision": 0.5258955987717503,
+        "recall": 0.5529487731381834,
+        "f1": 0.5390829923407827,
+        "roc_auc": 0.783361492244529,
+        "pr_auc": 0.5534204844403491,
+        "tn": 14038,
+        "fp": 2316,
+        "fn": 2077,
+        "tp": 2569,
+        "predicted_positive_rate": 0.23261904761904761
+      },
+      "model_threshold_dependence": "The model is selected on validation, while the threshold is calibrated from training-only out-of-fold predictions.  The two decisions therefore use different data.  The calibrated threshold assumes the selected model's probability ranking transfers to the train+validation refit.",
+      "note": "Each out-of-fold probability comes from a model fitted without the corresponding training record.  The test set was not accessed.  The threshold is fixed before test evaluation; the final pipeline is then refit on train+validation."
+    },
+    "test_samples": 4500,
+    "test_defaults": 995,
+    "at_selected_threshold": {
+      "threshold": 0.5,
+      "n_samples": 4500,
+      "n_positive": 995,
+      "accuracy": 0.7948888888888889,
+      "precision": 0.534816247582205,
+      "recall": 0.5557788944723618,
+      "f1": 0.5450961064563824,
+      "roc_auc": 0.780197277399838,
+      "pr_auc": 0.5597610475536883,
+      "tn": 3024,
+      "fp": 481,
+      "fn": 442,
+      "tp": 553,
+      "predicted_positive_rate": 0.22977777777777778
+    },
+    "at_0_5": {
+      "threshold": 0.5,
+      "n_samples": 4500,
+      "n_positive": 995,
+      "accuracy": 0.7948888888888889,
+      "precision": 0.534816247582205,
+      "recall": 0.5557788944723618,
+      "f1": 0.5450961064563824,
+      "roc_auc": 0.780197277399838,
+      "pr_auc": 0.5597610475536883,
+      "tn": 3024,
+      "fp": 481,
+      "fn": 442,
+      "tp": 553,
+      "predicted_positive_rate": 0.22977777777777778
+    },
+    "model_selection": {
+      "rule": "At the 0.50 reference threshold, require validation recall >= 0.55 and validation precision >= 0.50; among eligible models select the highest validation_pr_auc, breaking ties with validation_f1 and then validation_roc_auc.",
+      "policy_satisfied": true,
+      "reference_threshold": 0.5,
+      "recall_floor": 0.55,
+      "precision_floor": 0.5
+    }
+  },
+  "runtimes_seconds": {
+    "total": 397.154
+  },
+  "artefacts": {
+    "model": "models\\final_model.joblib",
+    "metadata": "models\\model_metadata.json",
+    "model_comparison": "reports\\model_comparison.csv",
+    "classification_report": "reports\\classification_report.csv",
+    "final_test_metrics": "reports\\final_test_metrics.json",
+    "threshold_analysis": "reports\\threshold_analysis.csv",
+    "data_quality_summary": "reports\\data_quality_summary.json",
+    "hyperparameter_tuning": "reports\\hyperparameter_tuning.csv",
+    "selection_policy": "reports\\selection_policy.json",
+    "feature_importance": "reports\\feature_importance.csv",
+    "feature_importance_model_based": "reports\\feature_importance_model_based.csv",
+    "subgroup_performance": "reports\\subgroup_performance.csv",
+    "fairness_analysis": "reports\\fairness_analysis.json",
+    "figures": [
+      "images\\07_model_comparison.png",
+      "images\\08_roc_curves.png",
+      "images\\09_precision_recall_curves.png",
+      "images\\10_confusion_matrix.png",
+      "images\\11_threshold_analysis.png",
+      "images\\12_feature_importance.png",
+      "images\\13_subgroup_performance.png"
+    ]
+  }
+}
